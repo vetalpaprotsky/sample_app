@@ -33,4 +33,7 @@ SampleApp::Application.configure do
 
   # Print deprecation notices to the stderr.
   config.active_support.deprecation = :stderr
-end
+
+  ActiveModel::SecurePassword.min_cost = true #алгоритм створення хешу для паролю повільний тому його 
+end                                           #важко взломати..для тестів нам це не потрібно..нам потрібно
+                                              #щоб вони працювали швидко..тому робимо хеш слабкий
