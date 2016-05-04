@@ -11,6 +11,7 @@ class UsersController < ApplicationController
   def create
   	@user = User.new(user_params)
   	if @user.save
+      sign_in @user
   		flash[:success] = "Welcome to Sample App!"	# => ДИВ. 7.3.2 ФЛЕШ
   		redirect_to @user # => те саме що і 'redirect_to user_path(@user)'
   	else
