@@ -1,0 +1,12 @@
+<% provide :title, "All users" %>
+<h1>All users</h1>
+
+<%= will_paginate %>
+
+<div class="users">
+	<% @users.each do |u| %>
+		<li> <%= render u %> </li> <!-- render u автоматично шукає паршал _user.html.ebr-->
+	<% end %><!--можна без each написати render @users і rails зрозуміє що треба кожен елемент рендирити-->
+</div>
+
+<%= will_paginate %>
