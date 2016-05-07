@@ -27,13 +27,33 @@ describe "User pages" do
 					expect(page).to have_selector('li', text: user.name)
 				end
 			end
-		end	
-
+		end 
 		#it "should list each user" do # => тест без пагінації
-		#	User.all.each do |user|
-		#		expect(page).to have_selector('li', text: user.name)
-		#	end
+		#   User.all.each do |user|
+		#       expect(page).to have_selector('li', text: user.name)
+		#   end
 		#end
+
+		describe "delete links" do
+			
+			it { should_not have_link("delete") }
+
+			describe "as an admin user" do
+				let(:admin) { FactoryGirl.create(:admin) }
+				before do
+					sign_in admin
+					visit users_path
+				end
+				# => силка видалення така сама як на вхід  \/...але там метод delete замість get
+				# => перший юзер в бд буде той створенний  | в самому верху ст.9
+				# => тому   силка   на  його   видалення в |  All users має бути
+				it { should have_link('delete', href: user_path(User.first)) }
+				it "should be able to delete another user" do
+					expect { click_link('delete', match: :first) }.to change(User, :count).by(-1)
+				end														 #/\першу силку яку знайде
+				it { should_not have_link('delete', href: user_path(admin)) } # => сам себе не має видаляти
+			end															
+		end
 	end
 
 	describe "profile page" do
@@ -52,14 +72,14 @@ describe "User pages" do
 	end
 
 	describe "signup page" do
-		before{ visit signup_path }	# => visit це Capybara функція
+		before{ visit signup_path } # => visit це Capybara функція
 		let(:submit) { "Create my account" }
 
 		describe "with invalid information" do
 			it "should not create a user" do
-			 	expect { click_button submit }.not_to change(User, :count)  # => click_button це Capybara функція
-			 	#одна верхня стрічка замінює чотири нижні стрічки
-			 	#initial = User.count
+				expect { click_button submit }.not_to change(User, :count)  # => click_button це Capybara функція
+				#одна верхня стрічка замінює чотири нижні стрічки
+				#initial = User.count
 				#click_button "Create my account"
 				#final = User.count
 				#expect(initial).to eq final
@@ -77,35 +97,35 @@ describe "User pages" do
 			end
 		end
 
-    describe "with valid information" do
-      before do
-        fill_in "Name",         with: "Example User" # => fill_in це Capybara функція
-        fill_in "Email",        with: "user@example.com"
-        fill_in "Password",     with: "foobar"
-        fill_in "Confirmation", with: "foobar"
-      end
+	describe "with valid information" do
+	  before do
+		fill_in "Name",         with: "Example User" # => fill_in це Capybara функція
+		fill_in "Email",        with: "user@example.com"
+		fill_in "Password",     with: "foobar"
+		fill_in "Confirmation", with: "foobar"
+	  end
 
-      it "should create a user" do
-        expect { click_button submit }.to change(User, :count).by(1)
-      end
+	  it "should create a user" do
+		expect { click_button submit }.to change(User, :count).by(1)
+	  end
 
-      describe "after submission" do
-      	before { click_button submit }
-      	let(:user) { User.find_by(email: "user@example.com") }
+	  describe "after submission" do
+		before { click_button submit }
+		let(:user) { User.find_by(email: "user@example.com") }
 
-      	it { should have_title(user.name) }
-      	it { should have_selector('div.alert.alert-success', text: 'Welcome') }
-      	it { should have_selector('h1', text: "Example User") }
-      end
+		it { should have_title(user.name) }
+		it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+		it { should have_selector('h1', text: "Example User") }
+	  end
 
-      describe "after saving the user" do
-        before { click_button submit }
-        let(:user) { User.find_by(email: 'user@example.com') }
+	  describe "after saving the user" do
+		before { click_button submit }
+		let(:user) { User.find_by(email: 'user@example.com') }
 
-        it { should have_link('Sign out') }
-        it { should have_title(user.name) }
-        it { should have_selector('div.alert.alert-success', text: 'Welcome') }
-      end
+		it { should have_link('Sign out') }
+		it { should have_title(user.name) }
+		it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+	  end
 		end
 	end
 
@@ -132,9 +152,9 @@ describe "User pages" do
 			let(:new_name) { "New Name" }
 			let(:new_email) { "new@example.com" }
 			before do
-				fill_in "Name", 			  with: new_name
-				fill_in "Email", 			  with: new_email
-				fill_in "Password", 		with: user.password
+				fill_in "Name",               with: new_name
+				fill_in "Email",              with: new_email
+				fill_in "Password",         with: user.password
 				fill_in "Confirmation", with: user.password_confirmation
 				click_button "Save changes"
 			end
