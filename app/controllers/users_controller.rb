@@ -1,7 +1,8 @@
 class UsersController < ApplicationController
-  before_action :signed_in_user, only: [:edit, :update, :index, :destroy]
-  before_action :correct_user,   only: [:edit, :update]
-  before_action :admin_user,     only: :destroy
+  before_action :non_signed_in_user, only: [:edit, :update, :index, :destroy]
+  before_action :signed_in_user,     only: [:new, :create]
+  before_action :correct_user,       only: [:edit, :update]
+  before_action :admin_user,         only: :destroy
 
   def index
     @users = User.paginate(page: params[:page])
@@ -39,7 +40,12 @@ class UsersController < ApplicationController
   end
 
   def destroy
-    User.find(params[:id]).destroy
+    @user = User.find(params[:id])
+    if current_user == @user
+      redirect_to root_url 
+      return
+    end
+    @user.destroy
     flash[:success] = "User deleted."
     redirect_to users_url
   end
@@ -50,7 +56,7 @@ class UsersController < ApplicationController
   	params.require(:user).permit(:name, :email, :password, :password_confirmation)
   end
 
-  def signed_in_user
+  def non_signed_in_user
     unless signed_in?
       store_location
       redirect_to signin_url, notice: "Please sign in."
@@ -58,6 +64,9 @@ class UsersController < ApplicationController
   end
   # => notice: "Please sign in." - те саме що і flash[:notice] = "Please sign in."
   # => але тут redirect_to приймає notice як параметр, а з flash нам потрібно писати окрему стрічку коду
+  def signed_in_user
+    redirect_to root_url unless current_user.nil?
+  end
 
   def correct_user
     @user = User.find(params[:id]) 
