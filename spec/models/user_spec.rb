@@ -7,6 +7,8 @@ describe User do
 
 	subject { @user }
 
+	it { should respond_to(:admin) }
+	it { should respond_to(:microposts) }
 	it { should respond_to(:name) }
 	it { should respond_to(:email) }
 	it { should respond_to(:password_digest) }
@@ -14,7 +16,7 @@ describe User do
 	it { should respond_to(:password_confirmation) }
 	it { should respond_to(:remember_token) }
 	it { should respond_to(:authenticate) }
-  it { should respond_to(:admin) }
+  
 
 	it { should be_valid }
   it { should_not be_admin }
@@ -122,6 +124,36 @@ describe User do
 		before { @user.save }
 		its(:remember_token) { should_not be_blank }
 		#те саме що it { expect(@user.remember_token).not_to be_blank }
+	end
+
+	describe "micropost association" do
+
+		before { @user.save }
+		#let змінні ліниві(вони створюются коли до них звертаються)
+		#let! змінні не ліниві(вони створються відразу) 
+		let!(:older_micropost) do
+			FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
+		end
+		let!(:newer_micropost) do
+			#user: @user - вказує якому юзеру належить мікроповідомлення(Див. factories.rb) 
+			#FactoryGirl позволяє змінити поле created_at (ActiveRecord не позволяє цього робити)
+			FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
+		end
+
+		it "should have right the microposts in the right order" do
+			expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]			
+		end# => microposts треба переводити в масив(to_a)...по дефолту це collection proxy
+
+		it "should destroy associated microposts" do
+			#робимо копію мікропостів і зразу переводимо їх до масиву(за допомогою to_a)
+			microposts = @user.microposts.to_a
+			@user.destroy
+			expect(microposts).not_to be_empty
+			microposts.each do |micropost|
+				#where верне nil якщо нічого не найде а find видасть exception
+				expect(Micropost.where(id: micropost.id)).to be_empty
+			end
+		end
 	end
 
 end

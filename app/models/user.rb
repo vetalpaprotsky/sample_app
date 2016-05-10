@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
-	#before_save { self.email = self.email.downcase } # => те саме що і нижня стрічка
+	has_many :microposts, dependent: :destroy
+  #before_save { self.email = self.email.downcase } # => те саме що і нижня стрічка
 	before_save { email.downcase! } # => стовбець email має індекс..через це нам треба перевести
   # => сам емеїл в нижній регістир тому що не всі адаптери БД використовують регістрозалежні індекси
 	before_create :create_remember_token
