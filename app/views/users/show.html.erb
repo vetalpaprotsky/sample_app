@@ -8,4 +8,21 @@
 			</h1>
 		</section>
 	</aside>
+  <div class="span8"> 
+    <% if @user.microposts.any? %>
+      <h3>Microposts(<%= @user.microposts.count %>)</h3>
+      <ol class="microposts">
+        <!--Rails бачить що @microposts масив і знає що потрібно обробити кожен елемент масиву
+        тому він шукає паршал з назвою _micropost.html.erb і 
+        застосовує його до кожного елементу масиву-->
+        <%= render @microposts %>
+      </ol>
+      <!--По дефолту якщо методу will_paginate не передати змінну то він буде використовув
+      змінну яка відповідає котроллеру. У нашому випадку ми в контроллері Users тому він буде
+      використовував @users(Див. users/index.html.erb).А нам треба робити пагінацію на мікроповідомлення
+      тому ми передаємо змінну @microposts
+      В зошиті є більше про пагінацію-->
+      <%= will_paginate @microposts %>
+    <% end %>
+  </div>
 </div>
