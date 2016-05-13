@@ -13,25 +13,46 @@ describe "Static pages" do
     before { visit root_path }
     let(:heading) { 'Sample App' }
     let(:page_title) { '' }
+    let(:user) { FactoryGirl.create(:user) }
+    before do
+      FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
+      FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
+    end 
 
     it_should_behave_like "all static pages"
     it { should_not have_title('| home') }
 
     describe "for signed-in user" do
-      let(:user) { FactoryGirl.create(:user) }
       before do
-        FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
-        FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
         sign_in user
         visit root_path
       end 
 
+      it "number of user's microposts should equal 2" do
+        expect(user.microposts.count).to eq 2
+      end
+
       it "should render user's feed" do
         user.feed.each do |item|
           expect(page).to have_selector("li##{item.id}", text: item.content)
+          expect(page).to have_link('delete', href: micropost_path(item))
         end
-      end 
-    end 
+      end
+
+      it "microposts pagination" do
+        30.times { |n| FactoryGirl.create(:micropost, user: user, content: "Lorem#{n}") }
+        visit current_path
+        expect(page).to have_selector('div.pagination')
+        user.microposts.paginate(page: 1).each do |micropost|
+          expect(page).to have_selector("li", text: micropost.content)
+        end
+      end
+    end
+
+    describe "for non signed-in user" do
+      before { visit root_path }
+      it { should_not have_link('delete') }
+    end
   end
 
   describe "Help page" do
@@ -73,43 +94,3 @@ describe "Static pages" do
     expect(page).to have_title(full_title(''))
   end
 end
-
-=begin
-  
-require 'spec_helper'
-
-describe "Static pages" do
-
-  subject { page }
-
-  describe "Home page" do
-    before { visit root_path }
-
-    it { should have_content('Sample App') }
-    it { should have_title(full_title('')) }
-    it { should_not have_title('| Home') }
-  end
-
-  describe "Help page" do
-    before { visit help_path }
-
-    it { should have_content('Help') }
-    it { should have_title(full_title('Help')) }
-  end
-
-  describe "About page" do
-    before { visit about_path }
-
-    it { should have_content('About') }
-    it { should have_title(full_title('About Us')) }
-  end
-
-  describe "Contact page" do
-    before { visit contact_path }
-
-    it { should have_content('Contact') }
-    it { should have_title(full_title('Contact')) }
-  end
-end
-  
-=end

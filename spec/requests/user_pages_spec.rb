@@ -60,15 +60,38 @@ describe "User pages" do
 		let(:user) { FactoryGirl.create(:user) }
 		let!(:m1) { FactoryGirl.create(:micropost, user: user, content: "Foo") }
 		let!(:m2) { FactoryGirl.create(:micropost, user: user, content: "Bar") }
+
 		before { visit user_path(user) }
 
 		it { should have_content(user.name) }
 		it { should have_title(user.name) }
-		
+
 		describe "microposts" do
+			it "quantity should equal 2" do
+				expect(user.microposts.count).to eq 2
+			end
+			it { should have_content("Microposts(#{user.microposts.count})") }
 			it { should have_content(m1.content) }
 			it { should have_content(m2.content) }
-			it { should have_content(user.microposts.count) }
+			it { should_not have_link('delete') }
+
+      describe "for signed-in user" do
+        before { sign_in user }
+        it "should have delete links" do
+          user.microposts.each do |micropost|
+            expect(page).to have_link('delete', href: micropost_path(micropost))
+          end
+        end 
+      end
+
+      it "pagination" do
+      	30.times { |n| FactoryGirl.create(:micropost, user: user, content: "Lorem#{n}") }
+        visit current_path
+        expect(page).to have_selector('div.pagination')
+        user.microposts.paginate(page: 1).each do |micropost|
+        	expect(page).to have_selector("li span.content", text: micropost.content)
+        end
+      end
 		end
 	end
 
@@ -107,33 +130,33 @@ describe "User pages" do
 
 	describe "with valid information" do
 	  before do
-		fill_in "Name",         with: "Example User" # => fill_in це Capybara функція
-		fill_in "Email",        with: "user@example.com"
-		fill_in "Password",     with: "foobar"
-		fill_in "Confirmation", with: "foobar"
+  		fill_in "Name",         with: "Example User" # => fill_in це Capybara функція
+  		fill_in "Email",        with: "user@example.com"
+  		fill_in "Password",     with: "foobar"
+  		fill_in "Confirmation", with: "foobar"
 	  end
 
 	  it "should create a user" do
-		expect { click_button submit }.to change(User, :count).by(1)
+		  expect { click_button submit }.to change(User, :count).by(1)
 	  end
 
 	  describe "after submission" do
-		before { click_button submit }
-		let(:user) { User.find_by(email: "user@example.com") }
+  		before { click_button submit }
+  		let(:user) { User.find_by(email: "user@example.com") }
 
-		it { should have_title(user.name) }
-		it { should have_selector('div.alert.alert-success', text: 'Welcome') }
-		it { should have_selector('h1', text: "Example User") }
-	  end
+  		it { should have_title(user.name) }
+  		it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+  		it { should have_selector('h1', text: "Example User") }
+  	 end
 
-	  describe "after saving the user" do
-		before { click_button submit }
-		let(:user) { User.find_by(email: 'user@example.com') }
+  	 describe "after saving the user" do
+  		before { click_button submit }
+  		let(:user) { User.find_by(email: 'user@example.com') }
 
-		it { should have_link('Sign out') }
-		it { should have_title(user.name) }
-		it { should have_selector('div.alert.alert-success', text: 'Welcome') }
-	  end
+  		it { should have_link('Sign out') }
+  		it { should have_title(user.name) }
+  		it { should have_selector('div.alert.alert-success', text: 'Welcome') }
+  	  end
 		end
 	end
 
