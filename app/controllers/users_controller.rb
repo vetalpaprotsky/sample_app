@@ -57,12 +57,6 @@ class UsersController < ApplicationController
   	params.require(:user).permit(:name, :email, :password, :password_confirmation)
   end
 
-  def non_signed_in_user
-    unless signed_in?
-      store_location
-      redirect_to signin_url, notice: "Please sign in."
-    end
-  end
   # => notice: "Please sign in." - те саме що і flash[:notice] = "Please sign in."
   # => але тут redirect_to приймає notice як параметр, а з flash нам потрібно писати окрему стрічку коду
   def signed_in_user

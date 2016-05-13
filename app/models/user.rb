@@ -21,6 +21,13 @@ class User < ActiveRecord::Base
     Digest::SHA1.hexdigest(token.to_s)
   end
 
+  def feed
+    #те саме що і просто виклик методу microposts
+    #id це метод
+    Micropost.where("user_id = ?", id)
+    #'user_id = ?' знак питання ставиться для захисту від SQL ін’єкції(Див. 10.3.3)
+  end
+
   private
 
     def create_remember_token

@@ -1,0 +1,13 @@
+<% if @feed_items.any? %>
+  <ol class="microposts">
+    <!--коли ми пишемо render 'something' то правильно передавати хеш а не просто стрічку
+    render partial: 'something'...Тут ми ще передали другий параметр collection: @feed_items
+    Тобто ми хочемо щоб паршал "shared/feed_item" спрацював для кожного елементу масиву @feed_items
+    Чому ти ми так не писали у вюсі 'users/show' коли ми ренлирили паршал 'microposts/micropost'?
+    Ми просто писали render @microposts, 
+    а не render partial: 'microposts/micropost', collection: @microposts
+    Тому, що micropost це є модель і з моделями можна писати так коротко =)-->
+    <%= render partial: 'shared/feed_item', collection: @feed_items %>
+  </ol>
+  <%= will_paginate @feed_items %>
+<% end %>
