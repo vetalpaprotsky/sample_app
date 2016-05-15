@@ -1,0 +1,6 @@
+//тут ми використовуємо DOM щоб поміняти назву кнопки Follow на Unfollow
+//і щоб збільшити число підписників користувача на одиницю
+//escape_javascript футкція потрібна для того щоб маскувати результати
+//при вставці HTML в JavaScript
+$("#follow_form").html("<%= escape_javascript(render('users/unfollow')) %>")
+$("#followers").html('<%= @user.followers.count %>')
