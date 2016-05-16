@@ -53,7 +53,10 @@ class User < ActiveRecord::Base
     #те саме що і просто виклик методу microposts
     #id це метод(self.id писати не обов’язково)
     #'user_id = ?' знак питання ставиться для захисту від SQL ін’єкції(Див. 10.3.3)
-    Micropost.where("user_id = ?", id)
+    #Micropost.where("user_id = ?", id)
+
+    #для того щоб витягнути поток мікроповідомлень користувача
+    Micropost.from_users_followed_by(self)
   end
 
   def following?(other_user)
