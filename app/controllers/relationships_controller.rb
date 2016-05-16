@@ -1,6 +1,10 @@
 class RelationshipsController < ApplicationController
   before_action :non_signed_in_user
 
+  #можна написати тільки 'respond_with @user' замість 'respond_to do |format|....end'
+  #у двох екшинах і тут поза екшинами написати respond_to :html, :js
+  #ефект такий самий
+
   def create
     @user = User.find(params[:relationship][:followed_id])
     current_user.follow!(@user)

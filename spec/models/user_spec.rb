@@ -205,4 +205,19 @@ describe User do
 		end
 	end
 
+	describe "relationship association" do
+		before do
+			@user.save
+			3.times { @user.follow!(FactoryGirl.create(:user)) }
+		end
+		it "should destroy all relationships" do
+			relationships = @user.relationships.to_a
+			@user.destroy
+			expect(relationships).not_to be_empty
+			relationships.each do |relationship|
+				expect(Relationship.where(id: relationship.id)).to be_empty
+			end
+		end
+	end
+
 end

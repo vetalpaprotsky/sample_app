@@ -1,0 +1,4 @@
+<%= gravatar_for @user, size: 52 %>
+<h1><%= @user.name %></h1>
+<span><%= link_to "view profile", @user %></span>
+<span><b>Microposts:</b> <%= @user.microposts.count %></span>
