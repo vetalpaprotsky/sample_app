@@ -8,15 +8,15 @@ FactoryGirl.define do
 		factory :admin do
 			admin true
 		end
-	end# => а тут кожне ствроння об’єкту буде ітерувати 'n'
+	end # => а тут кожне ствроння об’єкту буде ітерувати 'n'
 
 	factory :micropost do
 		content "Lorem ipsum"
-		user   # => ця стрічка говорить про те що мікроповідомлення належать юзерам
+		user # => ця стрічка говорить про те що мікроповідомлення належать юзерам
 	end
 end
 
-=begin 
+=begin
 FactoryGirl.define do
 	factory :user do
 		name	"Michael Hartl"
